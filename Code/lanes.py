@@ -85,6 +85,25 @@ photo = cv2.imread("/home/daino/Desktop/Self-Driving-Car-with-AI/Image/test_imag
 canny = canny(photo)
 masked_photo = region_of_interest(canny)
 
+Lines = cv2.HoughLinesP(masked_photo, 2,  np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap= 5 )
+'''
+This Function uses the Probabalistic Hough Space to get lines connecting points with each other, 
+and with that we can now the lanes the car is moving betweeen. 
+
+it uses the equation P = X*Cos(Theta) + Y*Sin(Theta)
+this is better than the standard line equation because it can deal with infinite slopes 
+
+Masked Phot   --> the photo to take lines from canny
+RHO           --> the number of pexels per single grid 
+Theta         --> precision in theta
+Threshold     --> the number of contacts between sinusoidal lines to conclude a line
+array         --> just an empy array that the function needs (search for the usage)
+minLineLength --> Minimum length of a single line to conduct it is a line in pexels
+maxLineGap    --> minimum pexels between two points to conduct it cant be used connected to a single line
+
+'''
+
+
 cv2.imshow('result', masked_photo) 
 cv2.waitKey(0)
 '''
