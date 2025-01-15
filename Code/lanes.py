@@ -81,7 +81,7 @@ def display_lines(image,lines):
     if lines is not None:
         for line in lines:
             X1,Y1,X2,Y2 = line.reshape(4)    
-            cv2.line(line_photo, (X1,Y1), (X2,Y2), 130 , 6)
+            cv2.line(line_photo, (X1,Y1), (X2,Y2), 250 , 6)
 
     
     return line_photo
@@ -117,7 +117,7 @@ maxLineGap    --> minimum pexels between two points to conduct it cant be used c
 '''
 line_image = display_lines(lane_image, Lines)
 
-cv2.imshow('result', photo) 
+cv2.imshow('result', line_image) 
 cv2.waitKey(0)
 '''
 THese are for showing the array we are making into image 
