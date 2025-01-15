@@ -3,6 +3,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def make_coordinates(image, line_paramters):
+    slope , intercept = line_paramters
+
+    y1 = image.shape[0]
+    y2 = int((3/5) *y1)
+    x1 = int((y1 - intercept)/slope)
+    x2 = int((y2 - intercept)/slope)
+
+    return np.array([x1,y1, x2,y2])
+
+
+def averge_slope_intercept(image , lines):
+
+    left_fit = []
+    right_fit = []
+
+    for line in lines:
+        x1,y1,x2,y2 = line.reshape(4)
+        paramters = np.polyfit( (x1,x2), (y1, y2), 1 )
+        slope = paramters[0]
+        intercept = paramters[1]
+        if slope <0:
+            left_fit.append((slope, intercept))
+        else :
+            right_fit.append((slope,intercept))
+
+    left_fit_avg = np.average(left_fit, axis=0)
+    right_fit_avg = np.average(right_fit, axis=0)
+
+    print(left_fit_avg, 'left')
+    print(right_fit_avg, 'right')
+
+    right_line = make_coordinates(image, right_fit_avg)
+    left_line = make_coordinates(image,left_fit_avg)
+
+    return np.array([left_line, right_line])
+
 def canny(photo):
 
     gray = cv2.cvtColor(photo, cv2.COLOR_RGB2GRAY)
@@ -41,7 +78,7 @@ def region_of_interest(photo):
 
     polygons = np.array([
 
-        [(300,height), (1000,height), (560,270)],
+        [(200,height), (1100,height), (550,250)],
 
             ])
     '''
@@ -99,53 +136,58 @@ def display_lines(image,lines):
 
 
 
-photo = cv2.imread("/home/daino/Desktop/Self-Driving-Car-with-AI/Image/test_image.jpg")
-lane_image = np.copy(photo)
-'''you need to make a copy of the originial array otherwise the edits
-    you make would affect the original Array as they both would be the same array
-'''
+
+if __name__ == '__main__':
+
+    photo = cv2.imread("/home/daino/Desktop/Self-Driving-Car-with-AI/Image/test_image.jpg")
+    lane_image = np.copy(photo)
+    '''you need to make a copy of the originial array otherwise the edits
+        you make would affect the original Array as they both would be the same array
+    '''
 
 
-canny = canny(lane_image)
-masked_photo = region_of_interest(canny)
+    canny_image = canny(lane_image)
+    masked_photo = region_of_interest(canny_image)
 
-Lines = cv2.HoughLinesP(masked_photo, 2,  np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap= 5 )
-'''
-This Function uses the Probabalistic Hough Space to get lines connecting points with each other, 
-and with that we can now the lanes the car is moving betweeen. 
+    Lines = cv2.HoughLinesP(masked_photo, 2,  np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap= 5 )
+    average_lines = averge_slope_intercept(lane_image , Lines)
+    '''
+    This Function HoghlinesP uses the Probabalistic Hough Space to get lines connecting points with each other, 
+    and with that we can now the lanes the car is moving betweeen. 
 
-it uses the equation P = X*Cos(Theta) + Y*Sin(Theta)
-this is better than the standard line equation because it can deal with infinite slopes 
+    it uses the equation P = X*Cos(Theta) + Y*Sin(Theta)
+    this is better than the standard line equation because it can deal with infinite slopes 
 
-Masked Phot   --> the photo to take lines from canny
-RHO           --> the number of pexels per single grid 
-Theta         --> precision in theta
-Threshold     --> the number of contacts between sinusoidal lines to conclude a line
-array         --> just an empy array that the function needs (search for the usage)
-minLineLength --> Minimum length of a single line to conduct it is a line in pexels
-maxLineGap    --> minimum pexels between two points to conduct it cant be used connected to a single line
+    Masked Phot   --> the photo to take lines from canny
+    RHO           --> the number of pexels per single grid 
+    Theta         --> precision in theta
+    Threshold     --> the number of contacts between sinusoidal lines to conclude a line
+    array         --> just an empy array that the function needs (search for the usage)
+    minLineLength --> Minimum length of a single line to conduct it is a line in pexels
+    maxLineGap    --> minimum pexels between two points to conduct it cant be used connected to a single line
 
-'''
-line_image = display_lines(lane_image, Lines)
+    '''
+    line_image = display_lines(lane_image, average_lines)
 
-Final_image = cv2.addWeighted(lane_image ,0.8, line_image,1, 1 )
-'''
-used to add weights of pexels on each others
-images must be same size.
-numbers next to image variables are intensitites 
-of images (multiply each pexel by this number).
-last number is an offset (1 is negligible)
-'''
-cv2.imshow('result', Final_image) 
-cv2.waitKey(0)
-'''
-THese are for showing the array we are making into image 
-the waitkey is important for making the show function work until pressing a key 
-'''
 
-#plt.imshow(canny(photo))
-#plt.show()
-'''
-we used matplotlib is it gives us the ability to see the ordered pexels numbers, which is 
-importnat for deciding on the region of interest.
-'''
+    Final_image = cv2.addWeighted(lane_image ,0.8, line_image,1, 1 )
+    '''
+    used to add weights of pexels on each others
+    images must be same size.
+    numbers next to image variables are intensitites 
+    of images (multiply each pexel by this number).
+    last number is an offset (1 is negligible)
+    '''
+    cv2.imshow('result', Final_image) 
+    cv2.waitKey(0)
+    '''
+    THese are for showing the array we are making into image 
+    the waitkey is important for making the show function work until pressing a key 
+    '''
+
+    #plt.imshow(canny(photo))
+    #plt.show()
+    '''
+    we used matplotlib is it gives us the ability to see the ordered pexels numbers, which is 
+    importnat for deciding on the region of interest.
+    '''
