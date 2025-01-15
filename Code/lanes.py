@@ -5,11 +5,8 @@ import matplotlib.pyplot as plt
 
 def canny(photo):
 
-    cp_photo = np.copy(photo)
-    gray = cv2.cvtColor(cp_photo, cv2.COLOR_RGB2GRAY)
-    '''you need to make a copy of the originial array otherwise the edits
-    you make would affect the original Array as they both would be the same array
-
+    gray = cv2.cvtColor(photo, cv2.COLOR_RGB2GRAY)
+    '''
     Making a gray image is important for detecting edge as it make it make every pexel has one valye, hence,
     reduce computation for edge detection (which is made by comparing the diffrence between pexelx values)
     '''
@@ -77,12 +74,28 @@ def region_of_interest(photo):
 
 
 
+def display_lines(image,lines):
+    
+    line_photo = np.zeros_like(image)
 
+    if lines is not None:
+        for line in lines:
+            X1,Y1,X2,Y2 = line.reshape(4)    
+            cv2.line(line_photo, (X1,Y1), (X2,Y2), 130 , 6)
+
+    
+    return line_photo
 
 
 
 photo = cv2.imread("/home/daino/Desktop/Self-Driving-Car-with-AI/Image/test_image.jpg")
-canny = canny(photo)
+lane_image = np.copy(photo)
+'''you need to make a copy of the originial array otherwise the edits
+    you make would affect the original Array as they both would be the same array
+'''
+
+
+canny = canny(lane_image)
 masked_photo = region_of_interest(canny)
 
 Lines = cv2.HoughLinesP(masked_photo, 2,  np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap= 5 )
@@ -102,9 +115,9 @@ minLineLength --> Minimum length of a single line to conduct it is a line in pex
 maxLineGap    --> minimum pexels between two points to conduct it cant be used connected to a single line
 
 '''
+line_image = display_lines(lane_image, Lines)
 
-
-cv2.imshow('result', masked_photo) 
+cv2.imshow('result', photo) 
 cv2.waitKey(0)
 '''
 THese are for showing the array we are making into image 
