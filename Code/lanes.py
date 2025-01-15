@@ -77,12 +77,23 @@ def region_of_interest(photo):
 def display_lines(image,lines):
     
     line_photo = np.zeros_like(image)
+    'make a black photo with same size of actual'
+
 
     if lines is not None:
+        'each line is a two dimentional like [[300 4000 5000 200]]'
         for line in lines:
             X1,Y1,X2,Y2 = line.reshape(4)    
-            cv2.line(line_photo, (X1,Y1), (X2,Y2), 250 , 6)
-
+            'reshaping here is transforming (1, 4) shape to one dimensional'
+            cv2.line(line_photo, (X1,Y1), (X2,Y2), (250,0,0) , 10)
+            '''
+            used to draw lines on a photo using the x and y
+            line photot --> photo to draw on
+            first vlaue --> first point
+            second value --> second point
+            250 --> BGR coloring
+            10--> thickness
+            '''
     
     return line_photo
 
@@ -117,7 +128,15 @@ maxLineGap    --> minimum pexels between two points to conduct it cant be used c
 '''
 line_image = display_lines(lane_image, Lines)
 
-cv2.imshow('result', line_image) 
+Final_image = cv2.addWeighted(lane_image ,0.8, line_image,1, 1 )
+'''
+used to add weights of pexels on each others
+images must be same size.
+numbers next to image variables are intensitites 
+of images (multiply each pexel by this number).
+last number is an offset (1 is negligible)
+'''
+cv2.imshow('result', Final_image) 
 cv2.waitKey(0)
 '''
 THese are for showing the array we are making into image 
