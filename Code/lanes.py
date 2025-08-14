@@ -186,7 +186,7 @@ if __name__ == '__main__':
     # it uses the equation P = X*Cos(Theta) + Y*Sin(Theta)
     # this is better than the standard line equation because it can deal with infinite slopes 
 
-    # Masked Phot   --> the photo to take lines from canny
+    # Masked Photo   --> the photo to take lines from canny
     # RHO           --> the number of pexels per single grid 
     # Theta         --> precision in theta
     # Threshold     --> the number of contacts between sinusoidal lines to conclude a line
